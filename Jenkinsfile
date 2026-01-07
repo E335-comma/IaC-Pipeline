@@ -37,7 +37,7 @@ pipeline {
         stage('Terraform Init'){
             steps {
                 dir('terraform-config') {
-                     sh 'terraform init -input=false'
+                     sh 'terraform init -input=false -migrate-state'
                 }
             }
         }

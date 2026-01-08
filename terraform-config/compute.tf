@@ -1,5 +1,6 @@
 data "aws_iam_role" "ssm_role" {
   name = "AmazonSSMRoleForEC2"
+  name = "AWSSSMManagedInstanceCore"
 }
 
 resource "aws_iam_instance_profile" "ssm_profile" {

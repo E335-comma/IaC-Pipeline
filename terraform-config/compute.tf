@@ -23,7 +23,7 @@ resource "aws_instance" "web" {
 }
 
 resource "aws_ssm_association" "ssm_role" {
-  name = "AWSSSM-ManagedInstanceCore"
+  name = aws_ssm_document.ssm_role.name
 
   targets {
     key = "InstanceId"

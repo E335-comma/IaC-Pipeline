@@ -3,7 +3,7 @@ resource "aws_iam_role" "ssm_role" {
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-    Statment = [
+    Statement = [
       {
         Effect = "Allow",
         Principal = {

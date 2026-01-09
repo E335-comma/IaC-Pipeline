@@ -74,7 +74,7 @@ pipeline {
                 sh '''
                     aws ec2 wait instance-running --instance-id $INSTANCE_ID --region $AWS_DEFAULT_REGION
 
-                    COMMAND_ID = $(aws ssm send-command \
+                    COMMAND_ID=$(aws ssm send-command \
                         --instance-id $INSTANCE_ID \
                         --document-name "AWS-RunShellScript" \
                         --parameters 'commands=[
@@ -90,7 +90,7 @@ pipeline {
                     echo "Docker deployment command sent. Command ID: $COMMAND_ID"
 
                     aws ssm wait command-executed \
-                        --command-id "$COMMAND_ID" \
+                        --command-id  $COMMAND_ID \
                         --instance-id $INSTANCE_ID \
                         --region $AWS_DEFAULT_REGION
 

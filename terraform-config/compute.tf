@@ -32,8 +32,8 @@ data "aws_iam_instance_profile" "ssm_instance_profile" {
 resource "aws_instance" "web" {
   ami           = var.web_instance_ami
   instance_type = "t3.micro"
-  iam_instance_profile = data.aws_iam_instance_profile.ssm_instance_profile.name
- # role = aws_iam_role.ssm_role.name
+#  iam_instance_profile = data.aws_iam_instance_profile.ssm_instance_profile.name
+  role = data.aws_iam_role.ssm_role.name
   subnet_id     = aws_subnet.public_subnet.id
   security_groups = [aws_security_group.ec2_sg.id]
 

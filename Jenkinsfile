@@ -5,7 +5,7 @@ pipeline {
         AWS_ACCESS_KEY_ID = credentials('aws-access-key')
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
         AWS_DEFAULT_REGION = 'eu-north-1'
-        DOCKER_IMAGE = 'my-node-app:latest'
+        DOCKER_IMAGE = 'my-node-app'
     } 
     
     stages {
@@ -67,8 +67,8 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh '''
-                        docker build -t $DOCKER_IMAGE .
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        #docker build -t $DOCKER_IMAGE .
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                         docker tag $DOCKER_IMAGE $DOCKER_USER/$DOCKER_IMAGE
                         docker push $DOCKER_USER/$DOCKER_IMAGE
                     '''
@@ -96,11 +96,17 @@ pipeline {
                         --instance-id $INSTANCE_ID \
                         --document-name "AWS-RunShellScript" \
                         --parameters 'commands=[
-                            "sudo yum update -y",
-                            "sudo yum install docker -y",
-                            "sudo systemctl start docker",
-                            "docker pull '"$DOCKER_USER"'/$DOCKER_IMAGE",
-                            "docker run -d -p 3000:3000 '"$DOCKER_USER"'/$DOCKER_IMAGE"
+                            "DOCKER_USER=elizabeth190",
+                            "DOCKER_IMAGE=my-node-app:latest",
+                            "sudo systemctl start amazon-ssm-agent || true",
+                            "sudo systemctl enable amazon-ssm-agent || true",
+                            "sudo dnf update -y >/dev/null 2>&1 || true",
+                            "sudo systemctl daemon-reload || true",
+                            "sudo dnf install -y docker || true",
+                            "sudo systemctl start docker 2>/dev/null || true",
+                            "sudo systemctl enable docker 2>/dev/null || true",
+                            "docker pull $DOCKER_USER/$DOCKER_IMAGE || true",
+                            "docker run -d -p 3000:3000 $DOCKER_USER/$DOCKER_IMAGE || true"
                             ]' \
                         --region $AWS_DEFAULT_REGION \
                         --query "Command.CommandId" \
@@ -116,10 +122,8 @@ pipeline {
                         --command-id $COMMAND_ID \
                         --instance-id $INSTANCE_ID \
                         --region $AWS_DEFAULT_REGION 
-                }
-
-                echo "Application deployed! Access it at http://$EC2_PUBLIC_IP:3000
                 '''
+                echo "Application deployed! Access it at http://$EC2_PUBLIC_IP:3000"
             }
         }
     }
